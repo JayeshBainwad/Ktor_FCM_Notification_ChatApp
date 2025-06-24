@@ -1,5 +1,15 @@
 FROM eclipse-temurin:17-jre
+
 WORKDIR /app
-COPY build/libs/*.jar app.jar
+
+# Copy everything
+COPY . .
+
+# Build the application using Gradle
+RUN ./gradlew installDist
+
+# Expose port (match your Ktor app port, default is 8080)
 EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+
+# Start the app (path comes from installDist)
+CMD ["./build/install/Ktor_FCM_Notification_ChatApp/bin/Ktor_FCM_Notification_ChatApp"]
