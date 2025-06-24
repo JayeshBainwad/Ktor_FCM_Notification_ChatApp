@@ -26,14 +26,20 @@ fun Application.module() {
 }
 
 fun initializeFirebase() {
-    val serviceAccount = File("src/main/resources/serviceAccountKey.json").inputStream()
+    val base64Key = System.getenv("FIREBASE_KEY_BASE64")
+    if (base64Key != null) {
+        val decodedKey = java.util.Base64.getDecoder().decode(base64Key)
+        val credentials = GoogleCredentials.fromStream(decodedKey.inputStream())
+        val options = FirebaseOptions.builder()
+            .setCredentials(credentials)
+            .build()
 
-    val options = FirebaseOptions.builder()
-        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-        .build()
-
-    if (FirebaseApp.getApps().isEmpty()) {
-        FirebaseApp.initializeApp(options)
-        println("✅ Firebase Admin SDK initialized.")
+        if (FirebaseApp.getApps().isEmpty()) {
+            FirebaseApp.initializeApp(options)
+            println("✅ Firebase Admin SDK initialized.")
+        }
+    } else {
+        println("❌ FIREBASE_KEY_BASE64 environment variable not set.")
     }
 }
+
